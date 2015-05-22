@@ -1,0 +1,5 @@
+name = Floor Manager
+description = Field to manage floor arraingment.
+package = Fields
+core = 7.x
+version = "7.x-0.1"

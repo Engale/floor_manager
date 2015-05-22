@@ -1,0 +1,59 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the floor_manager module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ *
+ * Defines the database schema of the field, using the format used by the
+ * Schema API.
+ *
+ * The data we will store here is just one 7-character element, even
+ * though the widget presents the three portions separately.
+ *
+ * All implementations of hook_field_schema() must be in the module's
+ * .install file.
+ *
+ * @see http://drupal.org/node/146939
+ * @see schemaapi
+ * @see hook_field_schema()
+ * @ingroup floor_manager
+ */
+function floor_manager_field_schema($field) {
+	$columns = array(
+		'floorrows' => array(
+			'type' => 'int',
+			'size' => 'small',
+			'not null' => FALSE,
+		),
+		'floorcols' => array(
+			'type' => 'int',
+			'size' => 'small',
+			'not null' => FALSE,
+		),
+		'floortables' => array(
+			'type' => 'int',
+			'size' => 'small',
+			'not null' => FALSE,
+		),
+		'floorgrid' => array(
+			'type' => 'text',
+			'size' => 'medium',
+			'not null' => FALSE,
+		),
+	);
+	
+	$indexes = array(
+		'floor' => array('floorrows', 'floorcols', 'floortables'),
+		'floorrows' => array('floorrows'),
+		'floorcols' => array('floorcols'),
+		'floortables' => array('floortables'),
+	);
+	
+	return array(
+		'columns' => $columns,
+		'indexes' => $indexes,
+	);
+}

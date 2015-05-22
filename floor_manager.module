@@ -1,0 +1,101 @@
+<?php
+function floor_manager_field_info() {
+	return array(
+		'floor_manager' => array(
+			'label' => t('Floor Manager'),
+			'description' => t('Floor manager for venus'),
+			'default_widget' => 'floor_manager',
+			'default_formatter' => 'floor_manager',
+		),
+	);
+}
+
+function floor_manager_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+  }
+}
+
+function floor_manager_field_is_empty($item, $field) {
+  return empty($item['floorrows']) || empty($item['floorcols']) || empty($item['floortables']);
+}
+
+function floor_manager_field_widget_info() {
+  return array(
+    'floor_manager' => array(
+      'label' => t('Floor Manager'),
+      'field types' => array('floor_manager'),
+    ),
+  );
+}
+
+function floor_manager_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+	switch ($instance['widget']['type']) {
+		case 'floor_manager':
+		$fields = array(
+			'floorrows' => t('Rows'),
+			'floorcols' => t('Columns'),
+			'floortables' => t('Tables'),
+		);
+		$widget = array();
+		foreach ($fields as $key => $label) {
+			$widget[$key] = array(
+				'#type' => 'textfield',
+				'#title' => $label,
+				'#default_value' => isset($items[$delta][$key]) ? $items[$delta][$key] : 1,
+				'#size' => 3,
+				'#maxsize' => 3,
+				'#attributes' => array(
+					'class' => array('edit-field-floor-manager-' . strtolower($label))
+				),
+			);
+		}
+		$widget['floorgrid'] = array(
+			'#type' => 'hidden',
+			'#title' => 'Grid',
+			'#default_value' => isset($items[$delta]['floorgrid']) ? $items[$delta]['floorgrid'] : '',
+			'#attributes' => array( 'class' => array('edit-field-floor-manager-grid')),
+			'#suffix' => '<div class="floor-manager-sorter"></div>',
+			'#attached' => array(
+			'library' => array(
+				array('system', 'ui.sortable'),
+			),
+				'js' => array(drupal_get_path('module', 'floor_manager') . '/floor_manager.js'),
+			)
+		);
+		break;
+	}
+	return ($element += $widget);
+}
+
+function floor_manager_field_formatter_info() {
+  return array(
+    'floor_manager' => array(
+      'label' => t('Floor Manager'),
+      'field types' => array('floor_manager'),
+    ),
+  );
+}
+
+function floor_manager_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+	$element = array();
+	
+	switch ($display['type']) {
+		case 'floor_manager':
+	    foreach ($items as $key => $item) {
+			//Set up the unordered list with the correct width
+			$html = '<ul style="width:' . $item['floorrows'] * 30 . 'px;">';
+			$json = json_decode($item['floorgrid']);
+			//Loop for each col and row to add a new item to the list
+			for($i = 0; $i < $item['floorrows'] * $item['floorcols']; $i++)
+			{
+				$html = $html . '<li data-id="' . $json[$i] -> id . '" style="text-align:center; margin:2px; padding:3; width:20px; height:20px; display:inline-block; border:1px #000 solid;">' . $json[$i] -> val . '</li>';
+			}
+			//End unordered list
+			$html = $html . '</ul>';
+			$element[$key] = array('#markup' => $html);
+		}
+		break;
+	}
+	
+	return $element;
+}
